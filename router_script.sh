@@ -61,6 +61,7 @@ then
 	echo
 	ip rule del from $SUSPECT lookup $TABLE
 	ip route del table $TABLE
+	echo 0 > /proc/sys/net/ipv4/ip_forward
 	echo
 	echo
 	echo "NEW PARAMS:" 

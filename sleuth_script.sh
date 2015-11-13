@@ -50,6 +50,7 @@ then
 	iptables -D FORWARD -d $SUSPECT -j ACCEPT
 	iptables -D FORWARD -s $SUSPECT -j ACCEPT
 	iptables -t nat -D POSTROUTING -s $SUSPECT -j MASQUERADE
+	echo 0 > /proc/sys/net/ipv4/ip_forward
 	echo 
 	echo 
 	echo 
