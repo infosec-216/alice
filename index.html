@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html>
+<head>
+<title>МФТИ-Телеком</title>
+<meta http-equiv="Content-Language" content="ru" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+<!--
+* {
+padding:0;
+margin:0;
+}
+body {
+margin:0;
+padding:0;
+border:0;
+height:100%;
+font-family:Arial,Helvetica,sans-serif;
+background:#fff;
+color:#000;
+font-size:12pt;
+}
+a,a:visited,a:active,a:hover {
+background:#fff;
+color:#1a3dc1;
+font-size:12pt;
+font-weight:normal;
+text-decoration:underline;
+}
+a:hover {
+color:#f00000;
+}
+ul,ol {
+padding:0 0 0 30px;
+list-style-position:inside;
+}
+p {
+text-indent:20px;
+padding:2px;
+}
+h1 {
+padding:10px;
+text-align:center;
+background:#149755;
+color:#fff;
+}
+h3 {
+font-size: 300%;
+padding:10px;
+text-align:center;
+}
+#main {
+padding:10px;
+}
+.pad30 {
+padding-left:30px;
+}
+address {
+margin-top:10px;
+text-align:right;
+font-style:normal;
+padding:3px;
+background:#149755;
+color:#fff;
+}
+address a,address a:visited,address a:active,address a:hover {
+background:#149755;
+font-style:normal;
+color:#ccc;
+}
+-->
+</style>
+</head>
+<body>
+<h1>МФTИ-Tелеком</h1>
+<div id="main">
+<h2><center>Приветствуем Вас в сети студенческого городка МФTИ.</center></h2>
+<h4><center>Для входа в сеть скачайте сертификат и поместите в ДОВЕРЕННЫЕ КОРНЕВЫЕ ЦЕНТРЫ СЕРТИФИКАЦИИ:<font color=white>*</font></center></h4>
+<br/>
+<center>
+<script>
+// Определяем "семейство" операционной системы:
+var os = 0;
+if (navigator.userAgent.indexOf ('Windows') != -1) os = 1;
+// alert(navigator.userAgent);
+document.write("<button onclick=");
+document.write('"');
+switch (os) {
+   case 1:
+      document.write("window.location='mipt-telecom.p12'");
+      break;
+   default:
+      document.write("window.location='mipt-telecom.pem'");
+      break;
+}
+document.write('"');
+document.write('><h3>СКАЧАТЬ</h3></button>');
+</script>
+</center><br/>
+
+<p>&nbsp;</p>
+<font color=white>* Данный сайт не принадлежит МФТИ-Телеком. Все совпадения дизайна и названий случайны. Все предпринимаемые вами действия вы делаете на свой страх и риск. Создатель сайта не несет никакой ответственности за возможные последствия. Нажимая скачать вы принимаете условия данного соглашения.</font>
+<p>&nbsp;</p>
+<h2>Контакты:</h2>
+<h4>&nbsp;&nbsp; www: <a href="http://mipt-telecom.ru/">MIPT-Тelecom.ru</a></h4>
+<h4>&nbsp;&nbsp; Телефоны:</h4>
+<ul>
+<li>+7 (498) 744-66-00</li>
+<li>+7 (495) 408-77-33</li>
+</ul>
+<h4>&nbsp;&nbsp; E-mail: <a href="mailto:telecom@mipt.ru">telecom@mipt.ru</a></h4>
+</div>
+<address>&copy;&nbsp;1999-2015 <a href="http://www.mipt-telecom.ru/">МФTИ-Tелеком</a></address>
+</body>
+</html>
