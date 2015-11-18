@@ -38,7 +38,7 @@ then
 	echo
 	echo
 else
-if [ "$1" = "kill" ]
+if [ "$1" = "stop" ]
 then
 	echo "CURRENT PARAMS:" 
 	echo
@@ -68,7 +68,7 @@ then
 	echo 
 	echo
 else
-	echo "Please use 'start' or 'kill' args"
+	echo "Please use 'start' or 'stop' args"
 fi
 fi
 
