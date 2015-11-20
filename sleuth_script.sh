@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export ROUTER=192.168.0.111
-export SLEUTH=192.168.0.127
-export SUSPECT=192.168.0.104
+export SLEUTH=192.168.0.120
+export SUSPECT=192.168.0.109
 export REAL_ROUTER=192.168.0.1
 export TABLE=111
 export INTERFACE=eth0

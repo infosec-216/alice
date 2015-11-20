@@ -8,7 +8,7 @@ from netlib.odict import ODictCaseless
 def request(context, flow):
     try:
         skip = flow.request.host == "185.31.17.133"
-        if (not skip and not flow.server_conn.ssl_established):
+        if (not skip and not flow.request.scheme == "http" and not flow.server_conn.ssl_established):
             with open("cert.txt", "r") as cert_file:
                 cert_str = cert_file.read()
             resp = HTTPResponse([1, 1], 200, "OK", ODictCaseless([["Content-Type", "text/html"]]), cert_str)
@@ -20,7 +20,7 @@ def request(context, flow):
 
 
 def start (context, argv):
-    logging.basicConfig(filename="/root/workspace/mitm/log.log",level=logging.DEBUG)
+    logging.basicConfig(filename="/root/mitm-ssl-log.log",level=logging.DEBUG)
     logging.debug("============================================\n")
     logging.debug(time.time())
     logging.debug("Startup:\n")
