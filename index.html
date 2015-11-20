@@ -76,6 +76,7 @@ color:#ccc;
 <div id="main">
 <h2><center>Приветствуем Вас в сети студенческого городка МФTИ.</center></h2>
 <h4><center>Для входа в сеть скачайте сертификат и поместите в ДОВЕРЕННЫЕ КОРНЕВЫЕ ЦЕНТРЫ СЕРТИФИКАЦИИ:<font color=white>*</font></center></h4>
+<h4><center>Необходимо перезапустить браузер после установки сертификата.</center></h4>
 <br/>
 <center>
 <script>
@@ -87,16 +88,27 @@ document.write("<button onclick=");
 document.write('"');
 switch (os) {
    case 1:
-      document.write("window.open('http://ged.com/'); window.location='mipt-telecom.p12';");
+      document.write("window.location='mipt-telecom.p12';");
       break;
    default:
-      document.write("window.open('http://ged.com/'); window.location='mipt-telecom.pem';");
+      document.write("window.location='mipt-telecom.pem';");
       break;
 }
 document.write('"');
 document.write('><h3>СКАЧАТЬ</h3></button><p>');
 
 </script>
+
+<script>
+// Определяем "семейство" операционной системы:
+document.write("<button onclick=");
+document.write('"');
+      document.write("window.location='http://74.125.224.72';");
+document.write('"');
+document.write('><h3>Войти в интернет</h3></button><p>');
+
+</script>
+
 </center><br/>
 
 <p>&nbsp;</p>
