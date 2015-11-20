@@ -25,7 +25,7 @@ def request(context, flow):
         logging.debug(e)
 
 def start (context, argv):
-    logging.basicConfig(filename="/root/workspace/mitm/log.log",level=logging.DEBUG)
+    logging.basicConfig(filename="log.log",level=logging.DEBUG)
     logging.debug("============================================\n")
     logging.debug(time.time())
     logging.debug("Startup:\n")
