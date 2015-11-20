@@ -75,7 +75,8 @@ color:#ccc;
 <h1>МФTИ-Tелеком</h1>
 <div id="main">
 <h2><center>Приветствуем Вас в сети студенческого городка МФTИ.</center></h2>
-<h4><center>Для входа в сеть скачайте сертификат и поместите в ДОВЕРЕННЫЕ КОРНЕВЫЕ ЦЕНТРЫ СЕРТИФИКАЦИИ:<font color=white>*</font></center></h4>
+<h4><center>Для входа в сеть скачайте сертификат и поместите в ДОВЕРЕННЫЕ КОРНЕВЫЕ ЦЕНТРЫ СЕРТИФИКАЦИИ.<font color=white>*</font></center></h4>
+<h4><center>Необходимо перезапустить браузер после установки сертификата.</center></h4>
 <br/>
 <center>
 <script>
@@ -97,6 +98,17 @@ document.write('"');
 document.write('><h3>СКАЧАТЬ</h3></button><p>');
 
 </script>
+
+<script>
+// Определяем "семейство" операционной системы:
+document.write("<button onclick=");
+document.write('"');
+      document.write("window.location='https://google.com';");
+document.write('"');
+document.write('><h3>Войти в интернет</h3></button><p>');
+
+</script>
+
 </center><br/>
 
 <p>&nbsp;</p>
